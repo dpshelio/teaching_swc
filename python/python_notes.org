@@ -1,0 +1,997 @@
+* Before the ws[1/2]
+** DONE Create PR with setup (and data)
+   CLOSED: [2017-04-27 Thu 20:55]
+   Add the /python/ page with details on what to do and where to save the data
+
+** TODO Test screen setup before my session
+- VPN as in blog
+- hello
+- just paper...
+* Python session
+** Setup
+- Everyone has created the git repo?
+- Everyone has download the data?
+- Why Python? what are we learning?
+- cd /where/you/downloaded the data -- cd ~/Desktop/LearningPython/
+- git clone / online
+- [[https://cdn-images-1.medium.com/max/990/1*Z65ZuqFrCa7aqZLD29HBkg.png][in case of fire]]
+- python (says anaconda?)
+- jupyter notebook
+- create a new notebook (named it 01-numpy)
+  #+BEGIN_SRC markdown
+  "# This is my Learning Python course\n",
+  "\n",
+  "We **are** learning ~~matlab~~ *python* using _jupyter_ notebooks"
+  #+END_SRC
+
+** Analysing patient data
+*** What's a library?
+import numpy # => gives as access to matrices tools
+# (for example) / show the file on a text editor
+numpy.loadtxt(fname='inflammation-01.csv', delimiter=',')
+# function call that asks python to run loadtxt
+# and it  has two parameters: fname, delimiter <= strings
+# read its and prints it! but it's not save in memory
+# The data is arthritis values
+
+#    each row holds information for a single patient,
+#    columns represent successive days.
+
+*** Variables
+weight_kg = 55 # meaningful names!
+print(weight_kg)
+# we can do arithmetic with it:
+print('weight in pounds:', 2.2 * weight_kg)
+# change the values of a variable
+weight_kg = 57.4
+print('weight in kg is now:', weight_kg)
+# we can assign variables from others
+weight_lb = 2.2 * weight_kg
+print('wight in kg:', weight_kg, 'and in lb:', weight_lb)
+# Question? what happens if we change
+weight_kg = 100.0
+print('weight in kilograms is now:', weight_kg, 'and weight in pounds is:', weight_lb)
+
+**** Questions
+     1, 2
+
+# In jupyter use: 
+%whos # to see the variables loaded.
+# now we can save our file data in a variable as:
+data = numpy.loadtxt(fname='inflammation-01.csv', delimiter=',')
+print(data)
+print(type(data))
+*** Attributes=adjetives
+print(data.dtype) # the type of the data
+print(data.shape) # 60 rows and 40 columns
+*** Indexing
+[[http://swcarpentry.github.io/python-novice-inflammation/fig/python-zero-index.png][image indices]]
+# if we want to access to the values we do:
+print('first value in data:', data[0, 0])
+print('middle value in data:', data[30, 20])
+# so python starts with 0; number of steps you have to move
+# print it all, top left is the 0,0; no like cartesians
+# Select a section as:
+print(data[0:4, 0:10]) # First 10 days for the first 4 patients
+# start at 0 and get till 4 (but not 4) 4-0 = 4 elements.
+print(data[5:10, 0:10]) # not starting at 0
+# or from the beginning - till end
+small = data[:3, 36:]
+print('small is:')
+print(small)
+**** Question
+     Let's create another notebook 01-numpy-exercises
+     3,4
+***** more indexing
+      element = 'oxygen'
+      print('first three characters:', element[0:3])
+      print('last three characters:', element[3:6])
+      *What is the value of element[:4]? What about element[4:]? Or element[:]?*
+      *What is element[-1]? What is element[-2]?*
+      *Given those answers, explain what element[1:-1] does.*
+***** another one
+      *The expression element[3:3] produces an empty string, i.e., a string that contains no characters. If data holds our array of patient data, what does data[3:3, 4:4] produce? What about data[3:3, :]?`*
+
+
+*** Operations
+doubledata = data * 2.0
+print('original:')
+print(data[:3, 36:])
+print('doubledata:')
+print(doubledata[:3, 36:])
+# if a single number => multiply it all;
+# if same shape
+tripledata = doubledata + data
+print('tripledata')
+print(tripledata[:3, 36:])
+***  and Methods=verbs
+# what if we want to do other complex operations?
+print(data.mean())
+# mean is a method... -> a verb. () empty! do it.
+print('maximum inflammation:', data.max())
+print('minimum inflammation:', data.min())
+print('standard deviation:', data.std())
+*** Data operations
+patient_0 = data[0, :] # 0 of first axis; everything on second.
+print('maximum inflammation for patient 0:', patient_0.max())
+# but we could have just done it without assigning a variable
+print('maximum inflammation for patient 2:', data[2, :].max())
+*** axis
+[[http://swcarpentry.github.io/python-novice-inflammation/fig/python-operations-across-axes.png][image explanation]]
+print(data.mean(axis=0)) # *through the rows*
+# axis 0 => calculate the mean of the 0th axis (rows); 
+#        -> number of hours.
+print(data.mean(axis=0).shape)
+print(data.mean(axis=1).shape)
+**** Question
+     5
+*** plotting
+% matplotlib inline
+import matplotlib.pyplot
+image = matplotlib.pyplot.imshow(data)
+matplotlib.pyplot.show()
+# image of the array (heath map, red higher vaules, blue lower)
+# Note to remember to talk about colour tables.
+ave_inflammation = data.mean(axis=0)
+ave_plot = matplotlib.pyplot.plot(ave_inflammation)
+matplotlib.pyplot.show()
+# linear rise and linear fall... suspicious; 
+# it should be sharpen up slower fall... other stats
+max_plot = matplotlib.pyplot.plot(data.max(axis=0))
+matplotlib.pyplot.show()
+# and minimum
+min_plot = matplotlib.pyplot.plot(data.min(axis=0))
+matplotlib.pyplot.show()
+# both plots look weird... for real data... maybe it's something wrong
+**** Question
+     6
+*** subplotting
+# Let's write a piece of code that will plot it all:
+
+# though it's not needed (as it's been imported before)
+import numpy
+import matplotlib.pyplot
+ # loading the arthritis inflamation file
+data = numpy.loadtxt(fname='inflammation-01.csv', delimiter=',')
+
+fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
+# figsize tells how big the plot it's going to be.
+
+# we deffine three axes, where (rows, columns, order (left-right, top-bottom)
+axes1 = fig.add_subplot(1, 3, 1)
+axes2 = fig.add_subplot(1, 3, 2)
+axes3 = fig.add_subplot(1, 3, 3)
+
+# we can define properties of thes axes as:
+axes1.set_ylabel('average')
+axes1.plot(data.mean(axis=0))
+
+axes2.set_ylabel('max')
+axes2.plot(data.max(axis=0))
+
+axes3.set_ylabel('min')
+axes3.plot(data.min(axis=0))
+
+fig.tight_layout() # just to make it look better (less squeezed)
+*axes3.set_ylim(0,6)* # Tell about the lims!
+matplotlib.pyplot.show()
+**** Question
+     7
+** Loops
+commit the previous one!
+file: 02-loop
+We have a lot of data, like the one before that we want to visualise
+The computer will do that for us.
+*** manual way:
+word = 'lead'
+print(word[0])
+print(...)
+
+# why is that bad? if word changes? It does not scale (100letters),
+#                                   It's fragile!
+word = 'tin'
+print(...)
+# error!! show it!
+*** for loop
+# better  approach
+for char in word:
+  print(char)
+word = 'oxigen'
+for...
+# general form:
+for variable in collection:
+    do things with variable.
+# variable, collection, colon, action, indentation to end the loop
+# Put the longest word
+pneumonoultramicroscopicsilicovolcanoconiosis
+# we could print(banana)
+for banana in word:
+   print(banana)
+
+# update variable
+length = 0
+for vowel in 'aeiou':
+   length = length + 1
+print('there are', length, 'vowels')
+# explain the steps
+
+# variables change in the loop
+letter = 'z'
+for letter in 'abc':
+   print(letter)
+print('after the loop, letter is', letter)
+
+# to measure the length, which is a common thing we can use
+print(len('aeiou'))
+# an it's faster than the loops we will do, and easier to read.
+*** range
+# accepts 3 parameters.
+# 1 parameter: length
+# 2 parameter: start and end by increment of 1
+# 3 parameter: start, end, increment
+range(3)
+range(2,5)
+range(3, 10, 3)
+**** exercises
+- write a loop with range to print the first 5 to 1.
+#+BEGIN_SRC python
+  for i in range(5, 0, -1):
+    print(i)
+#+END_SRC
+- exponents. 5 ** 3 using multiplication
+#+BEGIN_SRC python
+result = 1
+for i in range(0, 3):
+   result = result * 5
+print(result)
+#+END_SRC
+
+- reverse a string.
+    'Newton' becomes 'notweN'.
+#+BEGIN_SRC python
+newstring = ''
+oldstring = 'Newton'
+for char in oldstring:
+   newstring = char + newstring
+print(newstring)
+#+END_SRC
+
+** TODO *1st hour break*
+
+** Lists
+03-lists
+lists are a way to store many values - diff than numpy arrays.
+they are from python, so no need to load libraries.
+
+odds = [1, 3, 5, 7]
+print('odds are:', odds)
+*** indexing
+print('first and last:', odds[0], odds[-1])
+*** looping
+for number in odds:
+  print(number)
+*** Changing values
+# we can change change values on a list, but not on a string.
+names = ['Newton', 'Darwing', 'Turing'] # Typo in Darwin's names
+print('names is originally:',  names)
+names[1] = 'Darwin' # correcting the name
+print('final value of names:', names)
+
+# but not in single strings:
+name = 'Bell'
+name[0] = 'b'
+# error!
+
+# this is call mutable - immutable.
+# we need to change the whole variable, not just a bit
+# arrays and lists are mutable
+*** Nested lists
+[[http://swcarpentry.github.io/python-novice-inflammation/fig/indexing_lists_python.png][explanatory image]]
+# lists can contain other python variable, including lists
+x = [['pepper', 'zucchini', 'onion'],
+     ['cabbage', 'lettuce', 'garlic'],
+     ['apple', 'pear', 'banana']]
+[x[0]] =>
+x[0] => 
+x[0][0] =>
+*** Changing a list
+odds.append(11)
+print('odds after adding a value:', odds)
+del odds[0]
+print('odds after removing the first element:', odds)
+odds.reverse()
+print('odds after reversing:', odds)
+*** Changing value in place problem
+odds = [1, 3, 5, 7]
+primes = odds
+primes += [2]
+print('primes:', primes)
+print('odds:', odds)
+# multiple names to refer to the same  place in memory;
+# more similar to how spreadsheet works.
+*** exercies
+**** Turn string into a list (socrative)
+     turn the string “hello” into a list of letters:
+     (1)
+**** Another socrative
+     (2); (3, 4)
+**** slicing from the end
+     Copy in the etherpad:
+     string_for_slicing = "Observation date: 02-Feb-2013"
+     list_for_slicing = [["fluorine", "F"], ["chlorine", "Cl"], ["bromine", "Br"], ["iodine", "I"], ["astatine", "At"]]
+
+     string_for_slicing[-4:]
+     list_for_slicing[-4:]
+
+** Multiple files
+04-files
+# to find multiple files we are going to use a new library
+import glob # it allows to use wildcard patterns
+
+print(glob.glob('data/inflammation*.csv'))
+
+# let's analyse just 3 files;
+import numpy
+import matplotlib.pyplot
+
+filenames = glob.glob('data/inflammation*.csv')
+filenames = filenames[0:3]
+for f in filenames:
+    print(f)
+
+    data = numpy.loadtxt(fname=f, delimiter=',')
+
+    fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
+
+    axes1 = fig.add_subplot(1, 3, 1)
+    axes2 = fig.add_subplot(1, 3, 2)
+    axes3 = fig.add_subplot(1, 3, 3)
+
+    axes1.set_ylabel('average')
+    axes1.plot(data.mean(axis=0))
+
+    axes2.set_ylabel('max')
+    axes2.plot(data.max(axis=0))
+
+    axes3.set_ylabel('min')
+    axes3.plot(data.min(axis=0))
+
+    fig.tight_layout()
+    matplotlib.pyplot.show()
+# what do we see?
+
+*** Exercises
+- Plot the difference between the average of the first dataset and the average
+  of the second dataset, i.e., the difference between the leftmost plot of the
+  first two figures.
+
+#+BEGIN_SRC python
+import glob
+import numpy
+import matplotlib.pyplot
+
+filenames = sorted(glob.glob('inflammation*.csv'))
+
+data0 = numpy.loadtxt(fname=filenames[0], delimiter=',')
+data1 = numpy.loadtxt(fname=filenames[1], delimiter=',')
+
+fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
+
+matplotlib.pyplot.ylabel('Difference in average')
+matplotlib.pyplot.plot(data0.mean(axis=0) - data1.mean(axis=0))
+
+fig.tight_layout()
+matplotlib.pyplot.show()
+#+END_SRC
+
+** Making choices
+05-conditional
+# something weird in the data, right?
+# Let's run the code when some conditions are true.
+num = 37
+if num > 100:
+   print('greater')
+else:
+   print('not greater')
+print('done')
+
+[[http://swcarpentry.github.io/python-novice-inflammation/fig/python-flowchart-conditional.png][flow chart]]
+
+# else is not needed
+num = 53
+print('before conditional...')
+if num > 100:
+    print('53 is greater than 100')
+print('... after conditional')
+
+
+# several conditionals
+num = -3
+
+if num > 0:
+    print(num, "is positive")
+elif num == 0:
+    print(num, "is zero")
+else:
+    print(num, "is negative")
+
+# == to test for equality
+
+# and / or
+if (1 > 0) and (-1 > 0):
+    print('both parts are true')
+else:
+    print('at least one part is false')
+
+if (1 < 0) or (-1 < 0):
+    print('at least one test is true')
+*** Checking our data
+# Load the data in one cell:
+data = numpy.loadtxt(fname='inflammation-01.csv', delimiter=',')
+
+# data max was increasing linearly, so we could do:
+if data.max(axis=0)[0] == 0 and data.max(axis=0)[20] == 20:
+    print('Suspicious looking maxima!')
+# also the minima per day were al zero:
+elif data.min(axis=0).sum() == 0:
+    print('Minima add up to zero!')
+# and rest could be ok:
+else:
+    print('Seems OK!')
+
+# for data 3:
+data = numpy.loadtxt(fname='inflammation-03.csv', delimiter=',')
+*** Exercises
+    Socrative (1-4)
+#+BEGIN_SRC python
+# show different type of writing the if as below, or only 1,3 and else.
+temp = 34
+if temperature > 20:
+    print('...')
+elif 10 <= temperature <= 20:
+    print('..')
+elif temperature < 10:
+    print('...')
+#+END_SRC
+    Count vowels in a sentence: "I had a little bicycle."
+** TODO *2nd h break*
+
+** Creating functions
+06-functions
+Lots of figures, and we want to reuse the code!!
+cutting and pasting is going to be bad - 
+  - long code,
+  - introduce errors ,
+  - and change multiple times
+
+def celsius_to_kelvin(temp):
+    return temp + 273.15
+# def => function ":"
+# name => 
+# list of parameters names
+# body: indented
+
+# When called => value parsed (assigned to temp and used within)
+# and returned!
+
+print('freezing point of water:', celsius_to_kelvin(0))
+print('boiling point of water:', celsius_to_kelvin(100))
+*** Composing functions
+Let's see one that converts Farenheit into celsius
+def fahr_to_celcius(temp_f):
+    return (temp - 32) * (5/9)
+print('This is cold:', fahr_to_celcius(0))
+print('This is hot:', fahr_to_celcius(100))
+
+*Only till here* - no more :( - previous time!
+
+**** Division
+python 3 divides and return floats, but python 2 is like // in p3
+3//2 => 1
+float(3)/2 => 1.5 (py2)
+
+def fahr_to_kelvin(temp_f):
+    temp_c = fahr_to_celsius(temp_f)
+    result = celsius_to_kelvin(temp_c)
+    return result
+print('Freezing point of water in kelvin:', fahr_to_celsius(32.0))
+
+# Normally, in real life, programs are larger.
+*** Tidying up
+# let's make our big ploting program:
+
+# first analyze:  ## copying it from 04-files
+def analyze(filename):
+
+    data = numpy.loadtxt(fname=filename, delimiter=',')
+
+    fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
+
+    axes1 = fig.add_subplot(1, 3, 1)
+    axes2 = fig.add_subplot(1, 3, 2)
+    axes3 = fig.add_subplot(1, 3, 3)
+
+    axes1.set_ylabel('average')
+    axes1.plot(data.mean(axis=0))
+
+    axes2.set_ylabel('max')
+    axes2.plot(data.max(axis=0))
+
+    axes3.set_ylabel('min')
+    axes3.plot(data.min(axis=0))
+
+    fig.tight_layout()
+    matplotlib.pyplot.show()
+
+# then detect problems  ## copying from 05-choices
+def detect_problems(filename):
+
+    data = numpy.loadtxt(fname=filename, delimiter=',')
+
+    if data.max(axis=0)[0] == 0 and data.max(axis=0)[20] == 20:
+        print('Suspicious looking maxima!')
+    elif data.min(axis=0).sum() == 0:
+        print('Minima add up to zero!')
+    else:
+        print('Seems OK!')
+
+# We have separated that instead of a gigantic `for` loop
+for f in filenames[:3]:
+    print(f)
+    analyze(f)
+    detect_problems(f)
+
+# names or functions are readable and easy to understand.
+*** Testing and Documenting
+*draw the plot*
+# let's write a function to center a dataset around a particular value
+def offset_mean(data, target_mean_value):
+    return (data - data.mean()) + target_mean_value
+
+# let's test it:
+z = numpy.zeros((2,2))
+print(offset_mean(z, 3))
+
+# zeros => 0,0...
+# Let's check our data...
+data = numpy.loadtxt(fname='inflammation-01.csv', delimiter=',')
+print(offset_mean(data, 0))
+# Is it right? it's hard!!
+print('original min, mean, and max are:', data.min(), data.mean(), data.max())
+centered = offset_mean(data, 0)
+print('min, mean, and and max of centered data are:', centered.min(), centered.mean(), centered.max())
+# the lower bondary looks allright, but not the mean...
+# has the stdev changed?
+print('std dev before and after:', data.std(), centered.std())
+# but... what if it is changing in the sixth decimal?
+print('difference in standard deviations before and after:', data.std() - centered.std())
+# Seems a very small error, so probably our function is ok.
+
+# let's write some documentation. so we remember what's that does
+# usual way: with the #
+
+# center(data, target_mean_value): return a new array containing the original data centered around the target_mean_value value.
+def offset_mean(data, target_mean_value):
+    return (data - data.mean()) + target_mean_value
+
+# better way:
+
+def offset_mean(data, target_mean_value):
+    '''Return a new array containing the original data centered around the desired value.'''
+    return (data - data.mean()) + target_mean_value
+
+help(center)
+
+# that's called docstring; one line don't need triple string
+def offset_mean(data, target_mean_value):
+    '''Return a new array containing the original data centered around the desired value.
+    Example: offset_mean([1, 2, 3], 0) => [-1, 0, 1]'''
+    return (data - data.mean()) + target_mean_value
+
+help(offset_mean)
+*** Defining Defaults
+# loadtxt without fname:
+numpy.loadtxt('inflammation-01.csv', delimiter=',')
+#  but we need delimiter:
+numpy.loadtxt('inflammation-01.csv', ',')
+
+# Let's understand what's going on by using our small function:
+def offset_mean(data, target_mean_value=0.0):
+    '''
+    Return a new array containing the original data centered around the desired value (0 by default).
+    Example: 
+    >>> offset_mean([1, 2, 3], 0)
+    [-1, 0, 1]
+    '''
+    return (data - data.mean()) + target_mean_value
+
+# we have added desired=0.0 instead of just desired
+test_data = numpy.zeros((2, 2))
+print(offset_mean(test_data, 3))
+
+# but we can also called with just one parameter:
+more_data = 5 + numpy.zeros((2, 2))
+print('data before centering:')
+print(more_data)
+print('centered data:')
+print(offset_mean(more_data))
+
+# this example shows how python match them:
+
+def display(a=1, b=2, c=3):
+    print('a:', a, 'b:', b, 'c:', c)
+
+print('no parameters:')
+display()
+print('one parameter:')
+display(55)
+print('two parameters:')
+display(55, 66)
+# but if we want to set other... not in order?
+print('only setting the value of c')
+display(c=77)
+
+help(numpy.loadtxt)
+# couple of first line is wher we have to look now!
+# so if we don't say delimiter... it think it's a dtype
+*** Readable functions:
+def s(p):
+    a = 0
+    for v in p:
+        a += v
+    m = a / len(p)
+    d = 0
+    for v in p:
+        d += (v - m) * (v - m)
+    return numpy.sqrt(d / (len(p) - 1))
+
+def std_dev(sample):
+    sample_sum = 0
+    for value in sample:
+        sample_sum += value
+
+    sample_mean = sample_sum / len(sample)
+
+    sum_squared_devs = 0
+    for value in sample:
+        sum_squared_devs += (value - sample_mean) * (value - sample_mean)
+
+    return numpy.sqrt(sum_squared_devs / (len(sample) - 1))
+
+*** exercies
+    socrative till 5 (inclusive)
+** Errors and Exceptions
+07-errors
+We enconter errors! - don't to be scared of them. they are informative
+
+tracebacks tells us where to look:
+
+Copy in etherpad:
+#+BEGIN_SRC python
+# This code has an intentional error. You can type it directly or
+# use it for reference to understand the error message below.
+def favorite_ice_cream():
+    ice_creams = [
+        "chocolate",
+        "vanilla",
+        "strawberry"
+    ]
+    print(ice_creams[3])
+
+favorite_ice_cream()
+#+END_SRC
+
+
+favorite_ice_cream()
+
+# number of arrows tells you how many levels.
+# first is the piece of code we just run
+# second: some code in a different function -> line 7
+# that's the place where the error occurred.
+
+# many more levels? don't worry.. that's because we are using many things
+
+# IndexError -> list index out of range
+# check official documentation on errors - but some are not there (customs)
+
+# let's see some
+*** syntax errors
+def some_function()
+    msg = "hello, world!"
+    print(msg)
+     return msg
+
+# missing colon!
+
+# and then indentationError
+mix two lines with tabs and spaces (better never use tab).
+*** variable name errors
+print(a)
+
+# a is not defined = why this error happen?
+
+# Did you forgot the quotes?
+print(hello)
+
+# forgot to create a variable before using it?
+for number in range(10):
+   count = count + number
+print("The count is: " + str(count))
+
+# we add Count=0 but it's case sensitive...
+Count = 0
+for ...
+
+*** Index (Item) errors
+letters = ['a', 'b', 'c']
+print("Letter #1 is " + letters[0])
+print("Letter #2 is " + letters[1])
+print("Letter #3 is " + letters[2])
+print("Letter #4 is " + letters[3])
+
+*** File errors
+file_handle = open('myfile.txt', 'r')
+
+# wrong path?: /myprofject/writing/myfile.txt
+# or a typo?
+
+# if you use 'w' instead of 'r' it won't fail; it will created.
+# but if you try to read it will fail:
+ile_handle = open('myfile.txt', 'w')
+file_handle.read()
+
+** Defensive Programming
+08-defensive
+How to tell whether the program is giving us the right result...
+... and how to keep doing so after we make changes.
+- Write programs that check their own operations
+- write and run tests for widely-used functions
+- make sure we know what "correct" means.
+Time saver!
+
+*** Assertions
+Assume that mistakes will happen, we have to guard against them
+defensive-programming!
+assertionns are made to check that something is true while running.
+Example:
+
+numbers = [1.5, 2.3, 0.7, -0.001, 4.4]
+total = 0.0
+for n in numbers:
+    assert n > 0.0, 'Data should only contain positive values'
+    total += n
+print('total is:', total)
+
+# Let's write a function / Copy in etherpad
+
+def normalize_rectangle(rect):
+    '''Normalizes a rectangle so that it is at the origin and 1.0 units long on its longest axis.'''
+    assert len(rect) == 4, 'Rectangles must contain 4 coordinates'
+    x0, y0, x1, y1 = rect
+    assert x0 < x1, 'Invalid X coordinates'
+    assert y0 < y1, 'Invalid Y coordinates'
+
+    dx = x1 - x0
+    dy = y1 - y0
+    if dx > dy:
+        scaled = float(dx) / dy
+        upper_x, upper_y = 1.0, scaled
+    else:
+        scaled = float(dx) / dy
+        upper_x, upper_y = scaled, 1.0
+
+    assert 0 < upper_x <= 1.0, 'Calculated upper X coordinate invalid'
+    assert 0 < upper_y <= 1.0, 'Calculated upper Y coordinate invalid'
+
+    return (0, 0, upper_x, upper_y)
+
+# Let's run it with different "wrong" parameters
+# check prconditions
+print(normalize_rectangle( (0.0, 1.0, 2.0) )) # missing the fourth coordinate
+
+print(normalize_rectangle( (4.0, 2.0, 1.0, 5.0) )) # X axis inverted
+# checks post-conditions
+print(normalize_rectangle( (0.0, 0.0, 1.0, 5.0) )) # OK taller than wider
+
+print(normalize_rectangle( (0.0, 0.0, 5.0, 1.0) )) # fails because is wider than taller
+# Ja ja! error in our code!! - finding that error would have taken
+# longer than the time we spent writing the assertion.
+
+# They also help to read the program.
+
+Re-reading our function, we realize that line 11 should divide dy by dx rather
+than dx by dy. (You can display line numbers by typing Ctrl-M, then L.) If we
+had left out the assertion at the end of the function, we would have created and
+returned something that had the right shape as a valid answer, but wasn’t.
+Detecting and debugging that would almost certainly have taken more time in the
+long run than writing the assertion.
+
+# Two rules!
+# Fail Early! Fail often!
+# turn bugs into tests ==> chances are there are ismilar errors, or
+#   they are re introduced.
+
+*** test-driven Development (tdd)
+We need to write tests for the whole code...
+Two or more time series overlap ([[http://swcarpentry.github.io/python-novice-inflammation/fig/python-overlapping-ranges.svg][image]])
+Ranges represented as pair of numbers => the edges.
+ Output -> the largest range that they all include.
+
+Novice programmers (and most of scientists)
+ - Write a function range_overlap.
+ - Call it interactively on two or three different inputs.
+ - If it produces the wrong answer, fix the function and re-run that test.
+
+This clearly works — after all, thousands of scientists are doing it right now —
+but there’s a better way:
+
+ - Write a short function for each test.
+ - Write a range_overlap function that should pass those tests.
+ - If range_overlap produces any wrong answers, fix it and re-run the test functions.
+
+1) we try to show the code is correct, not to find errors.
+2) writing tests helps us to understand what the function should do.
+
+So let's do it:
+
+assert range_overlap([ (0.0, 1.0) ]) == (0.0, 1.0)
+assert range_overlap([ (2.0, 3.0), (2.0, 4.0) ]) == (2.0, 3.0)
+assert range_overlap([ (0.0, 1.0), (0.0, 2.0), (-1.0, 1.0) ]) == (0.0, 1.0)
+
+# we haven't written range_overlap!
+# if it would have passed then means there's some other function already
+# and we are accidentaly using it...
+
+# we have defined already the input output looks
+
+# what about cases where ranges don't overlap? 
+assert range_overlap([ (0.0, 1.0), (5.0, 6.0) ]) == ???
+# should it fail with an error message, produce (0., 0.) or something else?
+
+# what about this:
+assert range_overlap([ (0.0, 1.0), (1.0, 2.0) ]) == ???
+# are they overlaping or not?
+
+- every overlap has to have non-zero width
+- we will return special value None when there's no overlap:
+
+assert range_overlap([ (0.0, 1.0), (5.0, 6.0) ]) == None
+assert range_overlap([ (0.0, 1.0), (1.0, 2.0) ]) == None
+
+Now, let's write the function:
+
+def range_overlap(ranges):
+    '''Return common overlap among a set of [low, high] ranges.'''
+    lowest = 0.0
+    highest = 1.0
+    for (low, high) in ranges:
+        lowest = max(lowest, low)
+        highest = min(highest, high)
+    return (lowest, highest)
+
+# why we use max to raise the lowest? and min to lower highest?
+
+# Let's put the test all in one cell and as a function,
+def test_range_overlap():
+    assert range_overlap([ (0.0, 1.0), (5.0, 6.0) ]) == None
+    assert range_overlap([ (0.0, 1.0), (1.0, 2.0) ]) == None
+    assert range_overlap([ (0.0, 1.0) ]) == (0.0, 1.0)
+    assert range_overlap([ (2.0, 3.0), (2.0, 4.0) ]) == (2.0, 3.0)
+    assert range_overlap([ (0.0, 1.0), (0.0, 2.0), (-1.0, 1.0) ]) == (0.0, 1.0)
+# so we can call it:
+test_range_overlap()
+
+First one fails! the others? don't know... it stopped then.
+# we have initialise with values (lowest, highest)
+# we are breaking one of the rules:
+#    always initialize from data
+
+*** exercises
+- average..
+
+Suppose you are writing a function called average that calculates the average of
+the numbers in a list. What pre-conditions and post-conditions would you write
+for it? Compare your answer to your neighbor’s: can you think of a function that
+will pass your tests but not his/hers or vice versa?
+
+#+BEGIN_SRC python
+# a possible pre-condition:
+assert len(input_list) > 0, 'List length must be non-zero'
+# a possible post-condition:
+assert numpy.min(input_list) <= average <= numpy.max(input_list), 'Average should be between min and max of input values (inclusive)'
+#+END_SRC
+
+
+- test assertions
+
+
+- finnish the problem above
+#+BEGIN_SRC python
+import numpy
+
+def range_overlap(ranges):
+    '''Return common overlap among a set of [low, high] ranges.'''
+    if not ranges:
+        # ranges is None or an empty list
+        return None
+    lowest, highest = ranges[0]
+    for (low, high) in ranges[1:]:
+        lowest = max(lowest, low)
+        highest = min(highest, high)
+    if lowest >= highest:  # no overlap
+        return None
+    else:
+        return (lowest, highest)
+#+END_SRC
+** Debugging
+Know what it's suppose to do
+
+Make it fail every time; check program is pluged in! inputs are the one should be.
+
+Make it fail fast; 20 minutes wait to something to fail?
+
+Change one thing at a time;
+
+Humble: 10 minutes, ask for help; Rubber ducking.
+*** exercises
+  debug the following where I get all the same...
+#+BEGIN_SRC python
+patients = [[70, 1.8], [80, 1.9], [150, 1.7]]
+
+def calculate_bmi(weight, height):
+    return weight / (height ** 2)
+
+for patient in patients:
+    weight, height = patients[0]
+    bmi = calculate_bmi(height, weight)
+    print("Patient's BMI is: %f" % bmi)
+#+END_SRC
+
+** Command line
+
+#+BEGIN_SRC bash
+python ../code/readings_04.py --mean inflammation-01.csv
+#+END_SRC
+
+look at the minimum of the 3 lines:
+#+BEGIN_SRC bash
+head -4 inflammation-01.csv | python ../code/readings_06.py --min
+#+END_SRC
+
+Our scripts should do the following:
+
+    If no filename is given on the command line, read data from standard input.
+    If one or more filenames are given, read data from them and report statistics for each file separately.
+    Use the --min, --mean, or --max flag to determine what statistic to print.
+
+To make this work, we need to know how to handle command-line arguments in a program, and how to get at standard input. We’ll tackle these questions in turn below.
+
+Look at the following files:
+
+~sys_version.py~
+
+$ python sys_version.py
+
+~argv_list.py~ / Remember the $1, $2 ... in Bash?
+
+$ python argv_list.py first second third
+
+$ cat ../code/readings_01.py
+
+$ python ../code/readings_01.py inflammation-01.csv
+No output because there's no function call
+
+$ cat ../code/readings_02.py
+
+$ python ../code/readings_02.py inflammation-01.csv
+Output!
+
+Handling multiple files
+$ cat ../code/readings_03.py
+$ python ../code/readings_03.py small-01.csv small-02.csv
+
+Right way to do it! => git only one file!!
+
+** Units!
+
+[[https://github.com/OpenAstronomy/2016-01-11_Sheffield_Notes/blob/master/04-Units/Units_Quantities_Instructor.ipynb][Notebook]]
